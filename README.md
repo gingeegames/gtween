@@ -11,6 +11,11 @@ License
 =======
 GTween is free, open-source software under the supplied license.
 
+Contact
+=======
+web: http://www.gingee.com
+email: support@gingeegames
+
 Usage
 =====
 
