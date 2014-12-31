@@ -20,6 +20,9 @@ email: support@gingeegames
 Usage
 =====
 
+USER MUST INVOKE THE Animator.init() FUNCTION WITH Stage REFERENCE IN ORDER FOR GTWEEN TO WORK!
+Animator.init(this.stage);
+
 Usage example I:
 
 GTween.tweenTo(obj, 1.5, {x:500});
