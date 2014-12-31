@@ -20,6 +20,7 @@ email: support@gingeegames
 Usage
 =====
 
+** IMPORTANT **
 USER MUST INVOKE THE Animator.init() FUNCTION WITH Stage REFERENCE IN ORDER FOR GTWEEN TO WORK!
 Animator.init(this.stage);
 
