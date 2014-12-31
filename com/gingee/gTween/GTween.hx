@@ -23,8 +23,31 @@ class GTween
 	public static var VERSION:String = '1.0.5';
 	public static var OSCILLATE:String = 'osc';
 	public static var LOOP:String = 'loop';
+
 	/**
+	 * Created by Gingee LTD. 
+	 * Copyright (c) 2014-2015 Gingee LTD.
+	 * http://www.gingee.com 
+ 	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a 
+	 * copy of this software and associated documentation files (the "Software"), 
+	 * to deal in the Software without restriction, including without limitation the rights to 
+	 * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, 
+	 * and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+	 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+	 * 
+	 * 
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+	 * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+	 * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
+	 * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
+	 * OTHER DEALINGS IN THE SOFTWARE.
+	 *
 	 * GTween is a class that helps create rich tweens. it can be used on any type of object with any type of field that has a getter and a setter and its value is a Float.
+	 * <br/><br/>
+	 * *** IMPORTANT *** 
+	 * In order for GTween to work, you must invoke Animator.init(stage); once in you code!
+	 * <br/><br/>
 	 * <br/><br/>
 	 * @param obj:Dynamic - the object that we wish to tween.<br/>
 	 * @param timeInSec:Float - Tween time in seconds.
@@ -38,6 +61,7 @@ class GTween
 	 * onComplete:Void->Void - a function to invoke when tween has completed.<br/>
 	 * onStart:Void->Void - a function to invoke when tween has started. (after delay, if was defined)<br/>
 	 * onCompleteParams:Array - an array of parameters to pass when onComplete is invoked.<br/>
+	 * 
 	 * To create a tween please use the static methods GTween.tweenTo() and GTween.tweenFrom().
 	 * <br/><br/>
 	 * Example I:
@@ -94,6 +118,7 @@ class GTween
 		ignite();
 	}
 	
+	/* @private */
 	private function reverseVars():Void
 	{
 		var ln:Int = _tweens.length;
@@ -105,6 +130,7 @@ class GTween
 		}
 	}
 	
+	/* @private */
 	private function update(tm:Float):Void
 	{
 		var iii:Int = 0;
@@ -184,6 +210,7 @@ class GTween
 		}
 	}
 	
+	/* @private */
 	private function resetValues():Void
 	{
 		for( i in 0..._tweens.length )
@@ -193,6 +220,7 @@ class GTween
 		}
 	}
 	
+	/* pauses current tween. use resume(); in order to resume tween */
 	public function pause():Void
 	{
 		if(_paused)
@@ -206,6 +234,7 @@ class GTween
 		terminateIfPossible();
 	}
 	
+	/* resumes tween after a pause(); */
 	public function resume():Void
 	{
 		if(!_paused)
@@ -218,7 +247,7 @@ class GTween
 		ignite();
 	}
 	
-
+	/* @private */
 	private function complete():Void 
 	{
 		removeThisFromTweens();
@@ -233,7 +262,8 @@ class GTween
 				invoke(_vars, 'onComplete', onCompleteParams);
 		}
 	}
-	
+
+	/* @private */
 	private function addThisToTweens():Void
 	{
 		if(!_tween.exists(_object))
@@ -244,6 +274,7 @@ class GTween
 		_tween.set(_object, arr);
 	}
 
+	/* @private */
 	private function removeThisFromTweens():Void
 	{
 		var arr:Array<Dynamic> = _tween.get(_object);
@@ -260,6 +291,7 @@ class GTween
 			 _tween.remove(_object);
 	}
 	
+	/* sets object's tweened parameters to the final tween position */
 	public function completeAllMovements():Void
 	{
 		var ln = _tweens.length;
@@ -317,6 +349,7 @@ class GTween
 		Animator.submitAnimation(_updater);
 	}
 	
+	/* removes and destroys all currently listed tweens - set completeAnimation to true if you want objects to go to their final tween destination */
 	public static function removeAllTweens(completeAnimation:Bool = true):Void
 	{
 		for (k in Reflect.fields(_tween))
@@ -344,6 +377,7 @@ class GTween
 		terminateIfPossible();
 	}
 	
+	/* removes and destroys a tween by tweened object - set completeAnimation to true if you want objects to go to their final tween destination */
 	public static function removeTweensOf(obj:Dynamic, completeAnimation:Bool = true):Void
 	{
 		if(obj == null)
@@ -383,11 +417,39 @@ class GTween
 		return Timer.stamp() * 1000;
 	}
 
+	/* Creates and returns a new GTween object that handles tween process. This will tween the parameters from current value to the supplied value
+	 * @param obj:Dynamic - the object that we wish to tween.<br/>
+	 * @param timeInSec:Float - Tween time in seconds.
+	 * @param vars:Dynamic - tweening parameters.<br/>
+	 * Among vars fields, you can use following <br/>
+	 * delay:Float - delay time in Seconds. tween will start after that delay. </br>
+	 * ease:Float->Float->Float->Float->Float - the easing function. import from com.gingee.gTween.ease.*;<br/>
+	 * loop:String - looping capabilities. use GTween.OSCILLATE for back-and-forth behaviour. use GTween.LOOP for repeating behaviour. will run infinitly.<br/>
+	 * numLoops:Int - loop repetitions number. do not specify /use null for infinite.
+	 * onUpdate:Void->Void - a function to invoke when current tween is updating.<br/>
+	 * onComplete:Void->Void - a function to invoke when tween has completed.<br/>
+	 * onStart:Void->Void - a function to invoke when tween has started. (after delay, if was defined)<br/>
+	 * onCompleteParams:Array - an array of parameters to pass when onComplete is invoked.<br/>
+	 */
 	public static function tweenTo(obj:Dynamic, timeInSec:Float, vars:Dynamic):GTween
 	{
 		return new GTween(obj, timeInSec, vars, false);
 	}
 	
+	/* Creates and returns a new GTween object that handles tween process. This will tween the parameters from supplied value to the current value 
+ 	 * @param obj:Dynamic - the object that we wish to tween.<br/>
+	 * @param timeInSec:Float - Tween time in seconds.
+	 * @param vars:Dynamic - tweening parameters.<br/>
+	 * Among vars fields, you can use following <br/>
+	 * delay:Float - delay time in Seconds. tween will start after that delay. </br>
+	 * ease:Float->Float->Float->Float->Float - the easing function. import from com.gingee.gTween.ease.*;<br/>
+	 * loop:String - looping capabilities. use GTween.OSCILLATE for back-and-forth behaviour. use GTween.LOOP for repeating behaviour. will run infinitly.<br/>
+	 * numLoops:Int - loop repetitions number. do not specify /use null for infinite.
+	 * onUpdate:Void->Void - a function to invoke when current tween is updating.<br/>
+	 * onComplete:Void->Void - a function to invoke when tween has completed.<br/>
+	 * onStart:Void->Void - a function to invoke when tween has started. (after delay, if was defined)<br/>
+	 * onCompleteParams:Array - an array of parameters to pass when onComplete is invoked.<br/>
+	*/
 	public static function tweenFrom(obj:Dynamic, timeInSec:Float, vars:Dynamic):GTween
 	{
 		return new GTween(obj, timeInSec, vars, true);
@@ -398,6 +460,7 @@ class GTween
 		return c*t/d + b;
 	}
 	
+	/* returns true if no tweens are currently listed */
 	public static function noTweensLeft():Bool 
 	{
 		var ii:Int = 0;
