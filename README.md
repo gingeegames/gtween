@@ -7,6 +7,10 @@ it can be used with any type of object with any type of public field its value i
 
 GTween supports modifiers and can handle looping and easing functions.
 
+Demo
+=======
+http://gingeeapps.info/gtween/
+
 License
 =======
 GTween is free, open-source software under the supplied license.
