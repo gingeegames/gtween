@@ -20,7 +20,7 @@ class GTween
 	private var _paused:Bool = false;
 	private var _pausePrecentage:Float = 0;
 	
-	public static var VERSION:String = '1.0.5';
+	public static var VERSION:String = '1.0.6';
 	public static var OSCILLATE:String = 'osc';
 	public static var LOOP:String = 'loop';
 
@@ -329,25 +329,7 @@ class GTween
 				if(tween != null) tween.update(tm);
 			}
 		}
-	}
-
-	private static function terminateIfPossible():Void
-	{
-		if(!noTweensLeft())
-			return;
-
-		_animating = false;
-		Animator.removeAnimation(_updater);
-	}
-
-	private static function ignite():Void
-	{
-		if(_animating)
-			return;
-
-		_animating = true;
-		Animator.submitAnimation(_updater);
-	}
+	}	
 	
 	/* removes and destroys all currently listed tweens - set completeAnimation to true if you want objects to go to their final tween destination */
 	public static function removeAllTweens(completeAnimation:Bool = true):Void
@@ -407,16 +389,6 @@ class GTween
 		terminateIfPossible();
 	}
 
-	private static function invoke(obj:Dynamic, func:String, params):Void
-	{
-		Reflect.callMethod(obj, Reflect.field(obj, func), params);
-	}
-
-	private static function getTimer():Float
-	{
-		return Timer.stamp() * 1000;
-	}
-
 	/* Creates and returns a new GTween object that handles tween process. This will tween the parameters from current value to the supplied value
 	 * @param obj:Dynamic - the object that we wish to tween.<br/>
 	 * @param timeInSec:Float - Tween time in seconds.
@@ -455,11 +427,6 @@ class GTween
 		return new GTween(obj, timeInSec, vars, true);
 	}
 	
-	private static function easeNone(t:Float, b:Float, c:Float, d:Float):Float 
-	{
-		return c*t/d + b;
-	}
-	
 	/* returns true if no tweens are currently listed */
 	public static function noTweensLeft():Bool 
 	{
@@ -468,5 +435,52 @@ class GTween
 			ii++;
 
 		return ii == 0;
+	}
+
+	/**
+	* Invokes a function after a given amount of seconds
+	*
+	* @param callback Function to invoke
+	* @param delay - Invoking delay in seconds
+	* @param params - parameters passed the function (optional).
+	*/
+	public static function timeoutInvoke(callback, delay:Float, params:Array<Dynamic>):GTween
+	{
+		return new GTween(callback, 0, {delay:delay, onComplete:callback, onCompleteParams:params}, true);
+	}
+
+	// ............................. Private ...................................................
+
+	private static function invoke(obj:Dynamic, func:String, params):Void
+	{
+		Reflect.callMethod(obj, Reflect.field(obj, func), params);
+	}
+
+	private static function getTimer():Float
+	{
+		return Timer.stamp() * 1000;
+	}
+
+	private static function terminateIfPossible():Void
+	{
+		if(!noTweensLeft())
+			return;
+
+		_animating = false;
+		Animator.removeAnimation(_updater);
+	}
+
+	private static function ignite():Void
+	{
+		if(_animating)
+			return;
+
+		_animating = true;
+		Animator.submitAnimation(_updater);
+	}
+	
+	private static function easeNone(t:Float, b:Float, c:Float, d:Float):Float 
+	{
+		return c*t/d + b;
 	}
 }
