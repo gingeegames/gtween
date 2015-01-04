@@ -12,6 +12,9 @@ Languages
 Haxe utilizing openfl and lime.
 This code can be translated using openfl and Haxe directly to java, c#, html5 with js and many more.
 
+For additional information on Haxe please refer to http://www.haxe.org/
+openfl: http://www.openfl.org/
+
 Demo
 =======
 http://gingeeapps.info/gtween/
