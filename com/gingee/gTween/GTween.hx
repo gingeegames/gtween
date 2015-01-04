@@ -430,11 +430,10 @@ class GTween
 	/* returns true if no tweens are currently listed */
 	public static function noTweensLeft():Bool 
 	{
-		var ii:Int = 0;
 		for(key in _tween.keys())
-			ii++;
+			return false;
 
-		return ii == 0;
+		return true;
 	}
 
 	/**
