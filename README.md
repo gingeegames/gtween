@@ -7,6 +7,11 @@ it can be used with any type of object with any type of public field its value i
 
 GTween supports modifiers and can handle looping and easing functions.
 
+Languages
+==========
+Haxe utilizing openfl and lime.
+This code can be translated using openfl and Haxe directly to java, c#, html5 with js and many more.
+
 Demo
 =======
 http://gingeeapps.info/gtween/
@@ -35,3 +40,6 @@ GTween.tweenFrom(obj, 1.5, {points:500, onComplete:completeFunc, onUpdate:update
 Usage example III:
 
 GTween.tweenTo(obj, .5, {rotation:500, loop:GTween.OSCILLATE, ease:Bounce.easeIn, onStart:onStart, onComplete:onComplete, delay:.1, onCompleteParams:[1, 15], numLoops:3});
+
+
+Additional examples can be found under examples package.
