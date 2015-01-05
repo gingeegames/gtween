@@ -1,5 +1,6 @@
 1.0.6
 =======
+- Depricated Animator.init(stage)! its even easier to create tweens now :)
 - New static API: GTween.timeoutInvoke();
 - Additional Documentation
 - New example: Particle system
