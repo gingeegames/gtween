@@ -2,12 +2,12 @@
 =======
 - Depricated Animator.init(stage)! its even easier to create tweens now :)
 - New static API: GTween.timeoutInvoke();
+- Adapter for flash's Tween class. for code easy porting.
 - Additional Documentation
 - New example: Particle system
 - New example: TimeoutFunc
 - Minor bug fixes
 - Performances improvement
-
 1.0.5
 ======
 - Support delay parameter (in seconds)
