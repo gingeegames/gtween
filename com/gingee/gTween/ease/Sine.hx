@@ -2,6 +2,7 @@ package com.gingee.gTween.ease;
 
 class Sine
 {
+	public function new() {}
 	private static var HALF_PI:Float = Math.PI * 0.5;
 	
 	public static function easeIn (t:Float, b:Float, c:Float, d:Float):Float 

@@ -2,7 +2,8 @@ package com.gingee.gTween.ease;
 	
 class Quint
 {
-	public static var power:UInt = 4;
+	public function new() {}
+	public static var power:Int = 4;
 	
 	public static function easeIn (t:Float, b:Float, c:Float, d:Float):Float 
 	{
@@ -16,7 +17,7 @@ class Quint
 
 	public static function easeInOut (t:Float, b:Float, c:Float, d:Float):Float 
 	{
-		if ((t/=d*0.5) < 1) return c*0.5*t*t*t*t*t + b;
+		if (hx.GUtil.boolean((t/=d*0.5) < 1)) return c*0.5*t*t*t*t*t + b;
 		return c*0.5*((t-=2)*t*t*t*t + 2) + b;
 	}
 }

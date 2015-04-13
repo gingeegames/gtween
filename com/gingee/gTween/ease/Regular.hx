@@ -1,6 +1,10 @@
 package com.gingee.gTween.ease;
 
-class Linear
+/**
+ * ...
+ * @author Moshe Maman
+ */
+class Regular
 {
 	public function new() {}
 	public static var power:Int = 0;

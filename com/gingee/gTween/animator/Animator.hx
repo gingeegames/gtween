@@ -2,26 +2,29 @@ package com.gingee.gTween.animator;
 
 import com.gingee.gTween.animator.events.AnimatorEvent;
 import com.gingee.gTween.interfaces.IAdvanceable;
-
+import com.gingee.utils.TimerUtils;
 import openfl.display.Stage;
 import openfl.events.Event;
 import openfl.events.EventDispatcher;
-import haxe.ds.ObjectMap;
+
 
 /*
 * Animator is a IAdvanceable manager. it prevents the usage of multiple ENTER_FRAME event listeners and thus increases performances, order and stability.
 */
 class Animator
-{
-	private static var _eventHolder:Stage;
-	private static var myAnimations:ObjectMap<IAdvanceable, IAdvanceable> = new ObjectMap<IAdvanceable, IAdvanceable>();
+{	
+	public function new() {}
+	private static var _eventHolder:Stage = null;
+	//private static var myAnimations:GObjectMap = new GObjectMap();
+	private static var myAnimations:Array<IAdvanceable> = [];
 
 	/**
 	* Submit an IAdvanceable item to add to animation pool. 
 	*/
 	public static function submitAnimation(animation:IAdvanceable):Void
 	{
-		myAnimations.set(animation, animation);
+		if (animation == null) return;
+		if(myAnimations.indexOf(animation)==-1) myAnimations.push(animation);
 		ignite();
 	}
 	
@@ -30,11 +33,12 @@ class Animator
 	*/
 	public static function removeAnimation(animation:IAdvanceable):Bool
 	{
-		if(myAnimations.get(animation) == null)
-			return false;
+		if (animation == null) return false;
+		var index:Int = myAnimations.indexOf(animation);
+		if (index == -1) return false;
 		
+		myAnimations.splice(index, 1);
 		dispatchEvent(AnimatorEvent.REMOVED_FROM_ANIMATOR, animation);
-		myAnimations.remove(animation);
 		return true;
 	}
 	
@@ -43,12 +47,7 @@ class Animator
 	*/
 	public static function countKeys():Int 
 	{
-		var ii:Int = 0;
-		for(key in myAnimations.keys())
-			ii++;
-
-		return ii;
-		// return Reflect.fields(myAnimations).length;
+		return myAnimations.length;
 	}
 
 	/*
@@ -56,26 +55,23 @@ class Animator
 	*/
 	private static function animationsLeft():Bool
 	{
-		for(key in myAnimations.keys())
-			return true;
-
-		return false;
+		return myAnimations.length > 0;
 	}
 	
 	/*
 	* Prints current status to trace.
 	*/
-	public static function stats():Void
-	{
-		var ids:String = "";
-		for(key in Reflect.fields(myAnimations))
-		{
-			if(Reflect.hasField(key, "ID"))
-				ids += Reflect.field(key, "ID") + "\n";
-		}
-		
-		trace("Number of active animations: " + countKeys() + ".\n Names of identifiable:\n" + ids);
-	}
+	//public static function stats():Void
+	//{
+		//var ids:String = "";
+		//for(key in Reflect.fields(myAnimations))
+		//{
+			//if(hx.GUtil.boolean(Reflect.hasField(key, "ID")))
+				//ids += Reflect.field(key, "ID") + "\n";
+		//}
+		//
+		//trace("Number of active animations: " + countKeys() + ".\n Names of identifiable:\n" + ids);
+	//}
 
 	// ............................. PRIVATE ............................................
 
@@ -97,15 +93,47 @@ class Animator
 		if(_eventHolder != null)
 			return;
 		
+			
 		_eventHolder = openfl.Lib.current.stage;
 		_eventHolder.addEventListener(Event.ENTER_FRAME, advanceAll);
 	}
 	
+	private static var _fps:Float = Math.NaN;
+	private static var devider:Float = Math.NaN;
+	private static var use_devider:Bool = false;
+	private static var counter:Int = 0;
+	
+	public static var fps(null, set):Float;
+	private static function set_fps(v:Float):Float
+	{
+		_fps = v;
+		TimerUtils.setTimeOut(recalculate, 50);
+		return v;
+	}
+	
+	private static function recalculate():Void
+	{
+		devider = Math.round(RealFPS.FPS() / _fps);
+		if ( devider > 1)
+			use_devider = true;
+			
+		TimerUtils.setTimeOut(recalculate, 5000);
+	}
+	
 	private static function advanceAll(e:Event):Void
 	{
-		for(key in myAnimations.keys())
+		if (use_devider)
 		{
-			if(key != null && !key.advance())
+			counter++;
+			if (counter >= devider)
+				counter = 0;
+			else
+				return;
+		}
+		
+		for(key in myAnimations)
+		{
+			if(key != null  && !cast(key, IAdvanceable).advance())
 				removeAnimation(key);
 		}
 		

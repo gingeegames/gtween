@@ -7,18 +7,19 @@ import haxe.ds.ObjectMap;
 
 class GTween
 {
-	private var _timeInSec:Float;
+	private var _timeInSec:Float = 0;
 	private var _from:Bool = false;
-	private var _startTime:Float;
-	private var _delay:Float;
-	private var _duration:Float;
-	private var _object:Dynamic;
-	private var _vars:Dynamic;
+	private var _startTime:Float = 0;
+	private var _delay:Float = 0;
+	private var _duration:Float = 0;
+	private var _object:Dynamic = null;
+	private var _vars:Dynamic = null;
 	private var _started:Bool = false;
-	private var _tweens:Array<TweenDesc>;
+	private var _tweens:Array<TweenDesc> = null;
 	private var _easing = easeNone;
 	private var _paused:Bool = false;
 	private var _pausePrecentage:Float = 0;
+	private var _precentage:Float = 0;
 	
 	public static var VERSION:String = '1.0.6';
 	public static var OSCILLATE:String = 'osc';
@@ -44,9 +45,6 @@ class GTween
 	 * OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * GTween is a class that helps create rich tweens. it can be used on any type of object with any type of field that has a getter and a setter and its value is a Float.
-	 * <br/><br/>
-	 * *** IMPORTANT *** 
-	 * In order for GTween to work, you must invoke Animator.init(stage); once in you code!
 	 * <br/><br/>
 	 * <br/><br/>
 	 * @param obj:Dynamic - the object that we wish to tween.<br/>
@@ -92,12 +90,12 @@ class GTween
 			var val:Float = Reflect.getProperty(vars, k);
 			var objVal:Float = Reflect.getProperty(_object, k);
 
-			if(Reflect.field(_object, k) != null || /* fix for JS fields like __x*/ Reflect.hasField(_object, "__" + k))
+			if(Reflect.field(_object, k) != null  || hx.GUtil.boolean( /* fix for JS fields like __x*/ Reflect.hasField(_object, "__" + k)))
 			{
 				var td:TweenDesc = new TweenDesc();
 				td.prop = k;
 				
-				if(from)
+				if(hx.GUtil.boolean(from))
 				{
 					td.delta = objVal - val;
 					td.start = val;
@@ -112,7 +110,7 @@ class GTween
 			}
 		}
 		
-		if(Reflect.hasField(_vars, 'ease'))
+		if(hx.GUtil.boolean(Reflect.hasField(_vars, 'ease')))
 			_easing = Reflect.field(_vars, 'ease');
 
 		ignite();
@@ -136,11 +134,10 @@ class GTween
 		var iii:Int = 0;
 		var currentTime:Float = getTimer();
 
-
-		if(currentTime < _startTime)
+		if(hx.GUtil.boolean(currentTime < _startTime))
 			return;
 
-		if(!_started && Reflect.hasField(_vars, 'onStart')) 
+		if(!hx.GUtil.boolean(_started ) && hx.GUtil.boolean( Reflect.hasField(_vars, 'onStart'))) 
 		{
 			_started = true;
 			try{
@@ -149,17 +146,17 @@ class GTween
 		}
 		
 		var time:Float = (tm - _startTime) * 0.001;
-		var precentage:Float;
-		var i:Int;
+		var precentage:Float = 0;
+		var i:Int = 0;
 		
 		if (time >= _duration) 
 		{
 			time = _duration;
-			precentage = 1;//(_duration == 0.001) ? 1 : 0;
+			_precentage = precentage = 1;//(_duration == 0.001) ? 1 : 0;
 		} 
 		else
 		{
-			precentage = _easing(time, 0, 1, _duration);
+			_precentage = precentage = _easing(time, 0, 1, _duration);
 		}
 
 		for( i in 0..._tweens.length )
@@ -168,25 +165,25 @@ class GTween
 			Reflect.setProperty(_object, td.prop, td.start + (precentage * td.delta));
 		}
 		
-		if (Reflect.hasField(_vars, 'onUpdate'))
+		if (hx.GUtil.boolean(Reflect.hasField(_vars, 'onUpdate')))
 			invoke(_vars, 'onUpdate', null);
 		
 		if (time == _duration)
 		{
-			if(Reflect.hasField(_vars, 'loop'))
+			if(hx.GUtil.boolean(Reflect.hasField(_vars, 'loop')))
 			{
 				complete();
 				
 				var remainningLoops:Bool = true;
 				
-				if(Reflect.hasField(_vars, 'numLoops'))
+				if(hx.GUtil.boolean(Reflect.hasField(_vars, 'numLoops')))
 				{
 					var numLoops:Int = Reflect.field(_vars, 'numLoops');
 					Reflect.setProperty(_vars, 'numLoops', numLoops - 1);
 					if(numLoops - 1 <= 0) remainningLoops = false;
 				}
 				
-				if(remainningLoops)
+				if(hx.GUtil.boolean(remainningLoops))
 				{
 					var loop:String = Reflect.field(_vars, 'loop');
 					if(loop == OSCILLATE)
@@ -223,7 +220,7 @@ class GTween
 	/* pauses current tween. use resume(); in order to resume tween */
 	public function pause():Void
 	{
-		if(_paused)
+		if(hx.GUtil.boolean(_paused))
 			return;
 		
 		_paused = true;
@@ -237,7 +234,7 @@ class GTween
 	/* resumes tween after a pause(); */
 	public function resume():Void
 	{
-		if(!_paused)
+		if(!hx.GUtil.boolean(_paused))
 			return;
 		
 		_paused = false;
@@ -253,10 +250,10 @@ class GTween
 		removeThisFromTweens();
 		terminateIfPossible();
 		
-		if (Reflect.hasField(_vars, 'onComplete'))
+		if (hx.GUtil.boolean(Reflect.hasField(_vars, 'onComplete')))
 		{
 			var onCompleteParams:Dynamic = Reflect.field(_vars, 'onCompleteParams');
-			if(Reflect.hasField(_vars, 'numLoops') && Reflect.field(_vars, 'numLoops') - 1 <= 0)
+			if(hx.GUtil.boolean(Reflect.hasField(_vars, 'numLoops') ) &&  Reflect.field(_vars, 'numLoops') - 1 <= 0)
 				invoke(_vars, 'onComplete', onCompleteParams);
 			else if(_vars.numLoops == null)
 				invoke(_vars, 'onComplete', onCompleteParams);
@@ -266,7 +263,7 @@ class GTween
 	/* @private */
 	private function addThisToTweens():Void
 	{
-		if(!_tween.exists(_object))
+		if(!hx.GUtil.boolean(_tween.exists(_object)))
 			_tween.set(_object, new Array<Dynamic>());
 			
 		var arr = _tween.get(_object);
@@ -304,12 +301,32 @@ class GTween
 		}
 	}
 
-	private function destroy():Void
+	public function destroy():Void
 	{
 		_object = null;
 		_vars = null;
 	}
 	
+	public var paused(get, null):Bool;
+	
+	public function get_paused():Bool
+	{
+		return _paused;
+	}
+	
+	public var precent(get, null):Float;
+	
+	public function get_precent():Float
+	{
+		return _precentage;
+	}
+	
+	public var duration(get, null):Float;
+	
+	public function get_duration():Float
+	{
+		return _duration;
+	}
 	/* ..................................... STATIC ............................ */
 	
 	private static var _tween:ObjectMap<Dynamic, Array<Dynamic>> = new ObjectMap<Dynamic, Array<Dynamic>>();
@@ -346,7 +363,7 @@ class GTween
 					var an:GTween = twns[i];
 					if(an != null)
 					{
-						if(completeAnimation)
+						if(hx.GUtil.boolean(completeAnimation))
 							an.completeAllMovements();
 						an.destroy();
 					}
@@ -372,12 +389,12 @@ class GTween
 			var ln:Int = twns.length;
 			for(i in 0...ln)
 			{
-				if(Std.is(twns[i], GTween))
+				if(hx.GUtil.boolean(Std.is(twns[i], GTween)))
 				{
 					var an:GTween = cast(twns[i], GTween);
 					if(an != null)
 					{
-						if(completeAnimation) an.completeAllMovements();
+						if(hx.GUtil.boolean(completeAnimation)) an.completeAllMovements();
 						an.destroy();
 					}
 				}
@@ -462,7 +479,7 @@ class GTween
 
 	private static function terminateIfPossible():Void
 	{
-		if(!noTweensLeft())
+		if(!hx.GUtil.boolean(noTweensLeft()))
 			return;
 
 		_animating = false;
@@ -471,7 +488,7 @@ class GTween
 
 	private static function ignite():Void
 	{
-		if(_animating)
+		if(hx.GUtil.boolean(_animating))
 			return;
 
 		_animating = true;

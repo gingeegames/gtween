@@ -5,7 +5,7 @@ import openfl.events.Event;
 
 class AnimatorEvent extends Event
 {
-	public var animation:IAdvanceable;
+	public var animation:IAdvanceable = null;
 	
 	public function new(type:String, anim:IAdvanceable)
 	{
